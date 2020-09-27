@@ -1,11 +1,16 @@
 package com.bat.suites.base;
 
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
 import com.bat.driver.DriverScript;
+import com.bat.extent_report.ExtentManager;
+import com.bat.util.DataUtil;
 import com.bat.util.ExcelFileReader;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.DataProvider;
+import org.testng.asserts.SoftAssert;
 
 import java.io.FileInputStream;
 import java.util.Properties;
@@ -16,7 +21,11 @@ public class BaseTest {
 
     public String testName;
     public ExcelFileReader xlsReader;
-    public DriverScript driverScript = new DriverScript();;
+    public DriverScript driverScript = new DriverScript();
+
+    public ExtentReports report;
+    public ExtentTest test;
+    public SoftAssert softAssert;
 
     @BeforeTest
     public void initBeforeTest() {
@@ -50,10 +59,21 @@ public class BaseTest {
 
     @BeforeMethod
     public void initBeforeMethod() {
+        report = ExtentManager.getReport(prop.getProperty("report_path"));
+        test = report.createTest(testName);
+        driverScript.setTest(test);
     }
 
     @AfterMethod
     public void cleanUpAfterMethod() {
         driverScript.quit();
+
+        if(report != null)
+            report.flush();
+    }
+
+    @DataProvider
+    public Object[][] getData() {
+        return DataUtil.getTestData(testName, xlsReader);
     }
 }

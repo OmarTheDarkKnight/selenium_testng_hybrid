@@ -1,5 +1,7 @@
 package com.bat.driver;
 
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
 import com.bat.keywords.ApplicationKeyword;
 import com.bat.util.Constants;
 import com.bat.util.ExcelFileReader;
@@ -13,6 +15,8 @@ public class DriverScript {
     private Properties prop;
     private ApplicationKeyword applicationKeyword;
 
+    private ExtentTest test;
+
     public Properties getProp() {
         return prop;
     }
@@ -21,10 +25,15 @@ public class DriverScript {
         this.prop = prop;
     }
 
+    public void setTest(ExtentTest test) {
+        this.test = test;
+    }
+
     public void executeKeywords(String testName, ExcelFileReader xlsReader, Hashtable<String, String> data) {
         Method method;
         applicationKeyword = new ApplicationKeyword();
         applicationKeyword.setProp(this.getProp());
+        applicationKeyword.setTest(test);
 
         int rowNumber = xlsReader.getRowCount(Constants.KEYWORDS_SHEET);
         for(int rNum = 1; rNum < rowNumber; rNum++) {
@@ -34,7 +43,7 @@ public class DriverScript {
                 String objectKey = xlsReader.getCellData(rNum, Constants.OBJECT_KEY_COL);
                 String dataKey = xlsReader.getCellData(rNum, Constants.DATA_KEY_COL);
                 String dataValue = data.get(dataKey);
-//                System.out.println(keyword + " ---- " + prop.getProperty(objectKey) + " ---- " + dataKey + " : " + dataValue);
+                test.log(Status.INFO, keyword + " ---- " + prop.getProperty(objectKey) + " ---- " + dataKey + " : " + dataValue);
 
                 // set the object key and data value in the application key word class
                 applicationKeyword.setObjectKey(objectKey);
