@@ -10,6 +10,22 @@ public class DataUtil {
     private static ExcelFileReader xlsReader = null;
 
     /**
+     * Check if the run mode of the test case is Y or no
+     * If the run mode is Y - return true
+     * If the run mode is N - return false
+     * If the test case is not found, return false
+     * */
+    public static boolean isRunTetCase(String testName, ExcelFileReader xlsReader) {
+        int rows = xlsReader.getRowCount(Constants.TEST_CASES_SHEET);
+        for(int rNum = 1; rNum < rows; rNum++) {
+            if (xlsReader.getCellData(rNum, Constants.TCID_COL).equals(testName)) {
+                return xlsReader.getCellData(rNum, Constants.RUN_MODE_COL).equals(Constants.RUN_MODE_YES);
+            }
+        }
+        return false;
+    }
+
+    /**
      * Read data from the sheet with the same name of @param testName
      * Put each data set in a Hash map
      * Put all Hash maps in a two dimensional object array and return it

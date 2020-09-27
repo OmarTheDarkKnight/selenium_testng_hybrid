@@ -11,6 +11,7 @@ import java.util.Properties;
 
 public class DriverScript {
     private Properties prop;
+    private ApplicationKeyword applicationKeyword;
 
     public Properties getProp() {
         return prop;
@@ -22,7 +23,7 @@ public class DriverScript {
 
     public void executeKeywords(String testName, ExcelFileReader xlsReader, Hashtable<String, String> data) {
         Method method;
-        ApplicationKeyword applicationKeyword = new ApplicationKeyword();
+        applicationKeyword = new ApplicationKeyword();
         applicationKeyword.setProp(this.getProp());
 
         int rowNumber = xlsReader.getRowCount(Constants.KEYWORDS_SHEET);
@@ -48,5 +49,9 @@ public class DriverScript {
                 }
             }
         }
+    }
+
+    public void quit() {
+        if(applicationKeyword != null) applicationKeyword.closeBrowser();
     }
 }

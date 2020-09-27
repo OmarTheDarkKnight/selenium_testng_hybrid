@@ -3,6 +3,8 @@ package com.bat.suites.base;
 import com.bat.driver.DriverScript;
 import com.bat.util.ExcelFileReader;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
 
 import java.io.FileInputStream;
@@ -17,7 +19,7 @@ public class BaseTest {
     public DriverScript driverScript = new DriverScript();;
 
     @BeforeTest
-    public void init() {
+    public void initBeforeTest() {
         // load the properties files
         envProperties = new Properties();
         prop = new Properties();
@@ -44,5 +46,14 @@ public class BaseTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @BeforeMethod
+    public void initBeforeMethod() {
+    }
+
+    @AfterMethod
+    public void cleanUpAfterMethod() {
+        driverScript.quit();
     }
 }

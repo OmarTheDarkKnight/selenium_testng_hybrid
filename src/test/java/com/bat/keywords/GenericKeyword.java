@@ -11,6 +11,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Properties;
 
 public class GenericKeyword {
@@ -38,6 +39,10 @@ public class GenericKeyword {
         driver.manage().window().maximize();
     }
 
+    public void closeBrowser() {
+        if(driver != null) driver.quit();
+    }
+
     public void navigate() {
         driver.get(prop.getProperty(objectKey));
     }
@@ -46,7 +51,9 @@ public class GenericKeyword {
         if(locatorKey.endsWith(Constants.XPATH_LOCATOR_KEY)) return By.xpath(prop.getProperty(locatorKey));
         else if(locatorKey.endsWith(Constants.ID_LOCATOR_KEY)) return By.id(prop.getProperty(locatorKey));
         else if(locatorKey.endsWith(Constants.NAME_LOCATOR_KEY)) return By.name(prop.getProperty(locatorKey));
-        else return By.cssSelector(prop.getProperty(locatorKey));
+        else if(locatorKey.endsWith(Constants.CSS_LOCATOR_KEY)) return By.cssSelector(prop.getProperty(locatorKey));
+        else reportFailure("Invalid object key : " + objectKey + ".");
+        return null;
     }
 
     private WebElement getObject(String objectKey) {
@@ -61,7 +68,7 @@ public class GenericKeyword {
             // check if the element is clickable
             explicitWait.until(ExpectedConditions.elementToBeClickable(element));
         } catch(Exception e) {
-            // report failure
+            reportFailure("Object not found");
         }
         return element;
     }
@@ -73,4 +80,25 @@ public class GenericKeyword {
     public void click() {
         getObject(objectKey).click();
     }
+
+    public void validateTitle() {
+        String expectedTitle = prop.getProperty(objectKey);
+        String actualTitle = driver.getTitle();
+        if(!expectedTitle.equals(actualTitle)) {
+            reportFailure("Title did not match. Got the title as " + actualTitle);
+        }
+    }
+
+    private boolean isElementPresent(String objectKey) {
+        List<WebElement> elementList = driver.findElements(getObjectByLocator(objectKey));
+        return elementList.size() != 0;
+    }
+
+    public void validateElementPresent() {
+        if(!isElementPresent(objectKey)) {
+            reportFailure("Element not found " + objectKey);
+        }
+    }
+
+    public void reportFailure(String failureMessage) {}
 }
