@@ -42,7 +42,7 @@ public class DriverScript {
                 String objectKey = xlsReader.getCellData(rNum, Constants.OBJECT_KEY_COL);
                 String dataKey = xlsReader.getCellData(rNum, Constants.DATA_KEY_COL);
                 String dataValue = data.get(dataKey);
-                test.log(Status.INFO, keyword + " ---- " + prop.getProperty(objectKey) + " ---- " + dataKey + " : " + dataValue);
+                test.log(Status.INFO, "FROM XLS FILE : " + keyword + " ---- " + prop.getProperty(objectKey) + " ---- " + dataKey + " : " + dataValue);
 
                 String proceedOnFail = xlsReader.getCellData(rNum, Constants.PROCEED_COL).equals("N") ? "N" : "Y";
                 applicationKeyword.setProceedOnFail(proceedOnFail);

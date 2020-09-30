@@ -18,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -65,7 +66,7 @@ public class GenericKeyword {
     }
 
     public void closeBrowser() {
-        log("Closing browser " + data);
+        log("Closing browser.");
         if(driver != null) driver.quit();
     }
 
@@ -154,7 +155,11 @@ public class GenericKeyword {
     }
 
     public void takeScreenShot(WebElement element, String title) {
-        String filePath = ExtentManager.screenshotFolder;
+        String fileName = new Date().toString()
+                .replaceAll(":", "-")
+                .replaceAll(" ", "-")
+                + ".png";
+        String filePath = "./screenshots/" + fileName;
 
         // Get entire page screenshot
         File screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
@@ -174,9 +179,9 @@ public class GenericKeyword {
             }
 
             // Copy the element screenshot to report
-            filePath = filePath.trim();
-            FileUtils.copyFile(screenshot, new File(filePath));
-            test.addScreenCaptureFromPath(filePath, title);
+            FileUtils.copyFile(screenshot, new File(ExtentManager.screenshotFolder.trim() + fileName));
+            log("Taking Screenshot ->");
+            test.addScreenCaptureFromPath(filePath);
         } catch (IOException e) {
             e.printStackTrace();
         }

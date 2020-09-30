@@ -23,8 +23,8 @@ public class ExtentManager {
             file.mkdirs();
 
             //initialize adn configure the extent spark reporter
-            ExtentSparkReporter reporter = new ExtentSparkReporter(reportFolderName);
-            reporter.config().setReportName("TestNG Demo Maven Report");
+            ExtentSparkReporter reporter = new ExtentSparkReporter(reportFolderName+"//Report.html");
+            reporter.config().setReportName("TestNG Hybrid Demo Report");
             reporter.config().setDocumentTitle("Automation reports");
             reporter.config().setTheme(Theme.DARK);
             reporter.config().setEncoding("utf-8");
