@@ -11,6 +11,7 @@ public class Constants {
     public static final String KEYWORD_COL = "Keyword";
     public static final String OBJECT_KEY_COL = "Object_key";
     public static final String DATA_KEY_COL = "Data_key";
+    public static final String PROCEED_COL = "Proceed_on_fail";
 
     // sheet col data constants
     public static final String RUN_MODE_YES = "Y";

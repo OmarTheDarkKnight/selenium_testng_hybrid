@@ -25,7 +25,6 @@ public class BaseTest {
 
     public ExtentReports report;
     public ExtentTest test;
-    public SoftAssert softAssert;
 
     @BeforeTest
     public void initBeforeTest() {

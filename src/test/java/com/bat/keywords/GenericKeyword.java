@@ -3,16 +3,20 @@ package com.bat.keywords;
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
 import com.bat.configurations.SpringConfig;
+import com.bat.extent_report.ExtentManager;
 import com.bat.util.Constants;
 import com.bat.webdrivers.provider.WebDriverProvider;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.testng.Assert;
+import org.testng.asserts.SoftAssert;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Properties;
@@ -23,6 +27,8 @@ public class GenericKeyword {
     public String objectKey;
     public String data;
     public String objectVal;
+    public String proceedOnFail;
+    public SoftAssert softAssert;
 
     public ExtentTest test;
 
@@ -40,6 +46,10 @@ public class GenericKeyword {
 
     public void setTest(ExtentTest test) {
         this.test = test;
+    }
+
+    public void setProceedOnFail(String proceedOnFail) {
+        this.proceedOnFail = proceedOnFail;
     }
 
     public void log(String logMessage) {
@@ -127,7 +137,48 @@ public class GenericKeyword {
         // report the failure
         test.log(Status.FAIL, failureMessage);
         // take screen shot and embed it in the report
-        // fail the test
-//        Assert.fail(failureMessage);
+        takeScreenShot(failureMessage);
+        // fail the test depending on the value of proceed on failure
+        softAssert.fail(failureMessage);
+        if(proceedOnFail.equals("N")) {
+            assertAll();
+        }
+    }
+
+    public void assertAll() {
+        softAssert.assertAll();
+    }
+
+    public void takeScreenShot(String title) {
+        takeScreenShot(null, title);
+    }
+
+    public void takeScreenShot(WebElement element, String title) {
+        String filePath = ExtentManager.screenshotFolder;
+
+        // Get entire page screenshot
+        File screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+        try {
+            if(element != null) {
+                BufferedImage fullImg = ImageIO.read(screenshot);
+                // Get the location of element on the page
+                Point point = element.getLocation();
+
+                // Get width and height of the element
+                int eleWidth = element.getSize().getWidth();
+                int eleHeight = element.getSize().getHeight();
+
+                // Crop the entire page screenshot to get only element screenshot
+                BufferedImage elementScreenshot= fullImg.getSubimage(point.getX(), point.getY(), eleWidth, eleHeight);
+                ImageIO.write(elementScreenshot, "png", screenshot);
+            }
+
+            // Copy the element screenshot to report
+            filePath = filePath.trim();
+            FileUtils.copyFile(screenshot, new File(filePath));
+            test.addScreenCaptureFromPath(filePath, title);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

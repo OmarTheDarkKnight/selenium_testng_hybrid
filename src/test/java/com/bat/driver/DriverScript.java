@@ -6,7 +6,6 @@ import com.bat.keywords.ApplicationKeyword;
 import com.bat.util.Constants;
 import com.bat.util.ExcelFileReader;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -29,7 +28,7 @@ public class DriverScript {
         this.test = test;
     }
 
-    public void executeKeywords(String testName, ExcelFileReader xlsReader, Hashtable<String, String> data) {
+    public void executeKeywords(String testName, ExcelFileReader xlsReader, Hashtable<String, String> data) throws Exception {
         Method method;
         applicationKeyword = new ApplicationKeyword();
         applicationKeyword.setProp(this.getProp());
@@ -45,19 +44,19 @@ public class DriverScript {
                 String dataValue = data.get(dataKey);
                 test.log(Status.INFO, keyword + " ---- " + prop.getProperty(objectKey) + " ---- " + dataKey + " : " + dataValue);
 
+                String proceedOnFail = xlsReader.getCellData(rNum, Constants.PROCEED_COL).equals("N") ? "N" : "Y";
+                applicationKeyword.setProceedOnFail(proceedOnFail);
+
                 // set the object key and data value in the application key word class
                 applicationKeyword.setObjectKey(objectKey);
                 applicationKeyword.setData(dataValue);
 
                 // call the keyword methods dynamically
-                try {
-                    method = applicationKeyword.getClass().getMethod(keyword);
-                    method.invoke(applicationKeyword);
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
+                method = applicationKeyword.getClass().getMethod(keyword);
+                method.invoke(applicationKeyword);
             }
         }
+        applicationKeyword.assertAll();
     }
 
     public void quit() {
